@@ -1,5 +1,4 @@
 ##This initial code for Filtering, Sequence variants, and Merging/ remove chimeras, taxonomic assignments is modified from Benjamin Callahan, "A DADA2 workflow for Big Data: Paired-end" https://benjjneb.github.io/dada2/bigdata_paired.html to work with my data. 
-```{r}
 #Load the necessary libraries for preprocessing and analysis:
 library(ggplot2)
 library(phyloseq); packageVersion("phyloseq")
@@ -14,9 +13,7 @@ library(cowplot)
 library(grid)
 library(Rmisc)
 theme_set(theme_bw())
-```
 
-```{r}
 #Filtering raw files
 pathF <- "/FilePath/raw_data_F/" #set path for forward reads
 pathR <- "/FilePath/raw_data_R/" #set path for reverse reads
@@ -28,9 +25,7 @@ if(length(fastqFs) != length(fastqRs)) stop("Forward and reverse files do not ma
 #filterAndTrim(fwd=file.path(pathF, fastqFs), filt=file.path(filtpathF, fastqFs),
              # rev=file.path(pathR, fastqRs), filt.rev=file.path(filtpathR, fastqRs))
 filterAndTrim(fwd=file.path(pathF, fastqFs), filt=file.path(filtpathF, fastqFs), rev=file.path(pathR, fastqRs), filt.rev=file.path(filtpathR, fastqRs), trimLeft = c(40,20), truncLen=c(239,250), maxEE=2, truncQ=2, maxN=0, compress=TRUE, verbose=TRUE)
-```
 
-```{r}
 #Analyze quality scores:
 #These show your quality scores. Score ideally is above 30 (and is in my case for most samples). 20 is the minimum. 
 plotQualityProfile(fnFs[[50]])
@@ -41,9 +36,7 @@ plotQualityProfile(fnRs[[50]])
 plotQualityProfile(fnRs[[100]])
 plotQualityProfile(fnRs[[150]])
 plotQualityProfile(fnRs[[200]])
-```
 
-```{r}
 #Infer sequence variants
 library(dada2); packageVersion("dada2")
 # File parsing
@@ -65,9 +58,6 @@ errR <- learnErrors(filtRs, multithread=TRUE)
 mergers <- vector("list", length(sample.names))
 names(mergers) <- sample.names
 
-```
-
-```{r}
 #Sample inference and merger of paired-end reads
 #Here we will merge as 16S first
 for(sam in sample.names) {
@@ -79,9 +69,7 @@ for(sam in sample.names) {
   merger <- mergePairs(ddF, derepF, ddR, derepR,maxMismatch = 0, minOverlap = 5, justConcatenate = FALSE, verbose=TRUE, returnRejects = FALSE)
   mergers[[sam]] <- merger
   }
-```
 
-```{r}
 #Sample inference and merger of paired-end reads
 #Here we will merge as 18S 
 mergers18 <- vector("list", length(sample.names))
@@ -94,10 +82,7 @@ for(sam in sample.names) {
   ddR <- dada(derepR, err=errR, multithread=TRUE)
   EukMerger <- mergePairs(ddF, derepF, ddR, derepR,maxMismatch = 0, minOverlap = 5, justConcatenate = TRUE, verbose=TRUE, returnRejects = FALSE)
   mergers18[[sam]] <- EukMerger
-}
-```
 
-```{r}
 #16S sequence table with chimeras removed
 seqtab <- makeSequenceTable(mergers)
 #18S sequence table with chimeras removed
@@ -106,9 +91,7 @@ seqtab18 <- makeSequenceTable(mergers18)
 #Save files
 #saveRDS(seqtab, "/FilePath/seqtab.rds") 
 #saveRDS(seqtab18, "/FilePath/seqtab18.rds") 
-```
 
-```{r}
 #Remove chimeras, assign taxonomy
 library(dada2); packageVersion("dada2")
 # Merge multiple runs (if necessary)
@@ -123,9 +106,8 @@ tax18 <- assignTaxonomy(seqtab18, "/Users/lleonard/Documents/R/Compiled2019/silv
 # Write to disk
 #saveRDS(seqtab, "/FilePath/seqtab_final.rds") 
 #saveRDS(tax, "FilePath/tax_final.rds")
-```
 
-```{r}
+
 ##write taxonomy assignments to file...16S
 write.csv(tax, file = "taxa_silva_16S.csv")
 ##write taxonomy assignments to file...18S
@@ -141,9 +123,8 @@ uniquesToFasta(seqtab, "16S_uniques.fasta", ids = a)
 ##save unique sequences to a file for use in alignment. 18S
 a<-colnames(otu_table(seqtab18, taxa_are_rows=FALSE))
 uniquesToFasta(seqtab18, "18S_uniques.fasta", ids = a)
-```
+
 #RUN QIIME CODE IN BETWEEN HERE TO GENERATE TRE FILE
-```{r}
 #Load into phyloseq for 18S
 meta = ("/FilePath/2019MappingFileFinal.txt")
 meta = import_qiime_sample_data(meta)
@@ -158,9 +139,7 @@ ps_t_18S = merge_phyloseq(ps_18S,tree_Q2)
 unrare_18S = ps_t_18S
 #Run, check all numbers are different.
 sample_counts18S = sample_sums(unrare_18S)
-```
 
-```{r}
 #Load into phyloseq FOR 16S
 meta = ("/FilePath/2019MappingFileFinal.txt")
 meta = import_qiime_sample_data(meta)
@@ -176,9 +155,7 @@ ps_t_16S = merge_phyloseq(ps_16S,tree_Q2)
 unrare_16S = ps_t_16S
 #Run, check all numbers are different.
 sample_counts16 = sample_sums(unrare_16S)
-```
 
-```{r}
 #Rarify to 4299. Be sure to make a CSV and sort from smallest to largest, and just see if there is a clear drop where you can cut off
 #Run CB_all to make sure numbers make sense. 
 #Filter out 18S, 16S, Mitochondria and Chloroplasts.
@@ -191,9 +168,7 @@ CB_16S = rarefy_even_depth(CB16S, sample.size = 4299, replace = FALSE, trimOTUs 
 #Make sure here all the numbers are the same,67 samples have been removed, and 1729 OTUs have been removed
 sample_sums(CB_16S)
 write.csv(otu_table(CB16S), "16Sotu.csv")
-```
 
-```{r}
 #Rarify to 200. Not ideal, but the best option to have some samples to analyze.
 CB_18S = subset_taxa(unrare_18S, Kingdom == "Eukaryota")
 sums <-sample_sums(CB_18S)
@@ -203,18 +178,19 @@ set.seed(58373)
 CB_18S = rarefy_even_depth(CB_18S, sample.size = 200, replace = FALSE, trimOTUs = TRUE)
 sample_sums(CB_18S)
 write.csv(otu_table(CB16S), "18Sotu.csv")
-```
 
-```{r}
 #FILTER OTU TABLES
 #16S, filter out positive, negative, and excess samples we do not need
 CB16_Pos=subset_samples(CB_16S, Needle =="Positive")
 CB16_NoPos=subset_samples(CB_16S, (Needle !="Positive")&(Needle != "Blank")&(Needle != "Spruce"))
 CB16Paper2= subset_samples(CB16_NoPos, (Needle !="Red")&(Needle != "2Red")&(Needle != "Shade")&(Horizon !="Bot")&(Elevation !="NO"))
 #Filter samples by site location
-CB16_LM = subset_samples(CB_16S, Location == "Lower Montane") 
+CB16_LM = subset_samples(CB_16S, Location == "Lower Montane")
+CB16_LM_Paper2=subset_samples(CB16_LM, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
 CB16_LS = subset_samples(CB_16S, Location == "Lower Subalpine")
+CB16_LS_Paper2=subset_samples(CB16_LS, (Needle !="Red")&(Needle !="Shade")&(Needle !="Lodge")&(Needle !="Control")&(Horizon !="Bot"))
 CB16_US = subset_samples(CB_16S, Location == "Upper Subalpine")
+CB16_US_Paper2=subset_samples(CB16_US_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Lodge")&(Needle !="Control")&(Horizon !="Bot"))
 #_______________Lower_______________#
 #Specifiy sample types for Lower
 CB16LM_Green= subset_samples(CB16_LM, (Needle=="Green")&(Horizon !="Bot"))
@@ -230,7 +206,15 @@ LM16_Green_2019=subset_samples(CB16LM_Green, Year=="c_2019")
 LM16_Lodge_2017=subset_samples(CB16LM_Lodge, Year=="a_2017")
 LM16_Lodge_2018=subset_samples(CB16LM_Lodge, Year=="b_2018")
 LM16_Lodge_2019=subset_samples(CB16LM_Lodge, Year=="c_2019")
-#_______________Midddle_______________#
+#Filter by each sampling date.
+LMOne=subset_samples(CB16_LM_Paper2, Date=="a_One")
+LMTwo=subset_samples(CB16_LM_Paper2, Date=="b_Two")
+LMThree=subset_samples(CB16_LM_Paper2, Date=="c_Three")
+LMFour=subset_samples(CB16_LM_Paper2, Date=="d_Four")
+LMFive=subset_samples(CB16_LM_Paper2, Date=="e_Five")
+LMSix=subset_samples(CB16_LM_Paper2, Date=="f_Six")
+LMSeven=subset_samples(CB16_LM_Paper2, Date=="g_Seven")
+#_______________Middle_______________#
 #Specify snowmelt plots at the Middle site
 CB16_LS_induced = subset_samples(CB16_LS, Snowmelt == "Induced")
 CB16_LS_regular = subset_samples(CB16_LS, Snowmelt == "Regular")
@@ -248,6 +232,14 @@ LS16_Green_2019=subset_samples(CB16LS_Green, Year=="c_2019")
 LS16_Lodge_2017=subset_samples(CB16LS_Lodge, Year=="a_2017")
 LS16_Lodge_2018=subset_samples(CB16LS_Lodge, Year=="b_2018")
 LS16_Lodge_2019=subset_samples(CB16LS_Lodge, Year=="c_2019")
+#Filter by each sampling date.
+LSOne=subset_samples(CB16_LS_Paper2, Date=="a_One")
+LSTwo=subset_samples(CB16_LS_Paper2, Date=="b_Two")
+LSThree=subset_samples(CB16_LS_Paper2, Date=="c_Three")
+LSFour=subset_samples(CB16_LS_Paper2, Date=="d_Four")
+LSFive=subset_samples(CB16_LS_Paper2, Date=="e_Five")
+LSSix=subset_samples(CB16_LS_Paper2, Date=="f_Six")
+LSSeven=subset_samples(CB16_LS_Paper2, Date=="g_Seven")
 #_______________Upper_______________#
 #Specifiy sample types for Upper
 CB16US_Green= subset_samples(CB16_US, (Needle=="Green")&(Horizon !="Bot"))
@@ -263,27 +255,20 @@ US16_Green_2019=subset_samples(CB16US_Green, Year=="c_2019")
 US16_Lodge_2017=subset_samples(CB16US_Lodge, Year=="a_2017")
 US16_Lodge_2018=subset_samples(CB16US_Lodge, Year=="b_2018")
 US16_Lodge_2019=subset_samples(CB16US_Lodge, Year=="c_2019")
+#Filter by each sampling date.
+USOne=subset_samples(CB16_US_Paper2, Date=="a_One")
+USTwo=subset_samples(CB16_US_Paper2, Date=="b_Two")
+USThree=subset_samples(CB16_US_Paper2, Date=="c_Three")
+USFour=subset_samples(CB16_US_Paper2, Date=="d_Four")
+USFive=subset_samples(CB16_US_Paper2, Date=="e_Five")
+USSix=subset_samples(CB16_US_Paper2, Date=="f_Six")
+USSeven=subset_samples(CB16_US_Paper2, Date=="g_Seven")
 
-
-
-```
-
-```{r}
 #18S, filter by site
 CB18_NoPos=subset_samples(CB_18S, (Needle !="Positive")&(Needle != "Blank")&(Needle != "Spruce")&(Sample !="LM.G2.2.09.20.2019")&(Sample!="LS.2XR3.SM.06.14.2019"))
 CB18_LM = subset_samples(CB_18S, Location == "Lower Montane") 
 CB18_LS = subset_samples(CB_18S, Location == "Lower Subalpine")
 CB18_US = subset_samples(CB_18S, Location == "Upper Subalpine")
-
-
 CB18Paper2= subset_samples(CB18_NoPos, (Needle !="Red")&(Needle != "2Red")&(Needle != "Shade")&(Horizon !="Bot")&(Elevation !="NO"))
-
 CB18_LS_induced = subset_samples(CB18_LS, Snowmelt == "Induced")
 CB18_LS_regular = subset_samples(CB18_LS, Snowmelt == "Regular")
-
-CB_18S_nodubs= subset_samples(CB18_NoPos, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-Paper2_18S= subset_samples(CB_18S_nodubs, (Needle !="Red")&(Date !="2Red"))
-
-
-```
-
