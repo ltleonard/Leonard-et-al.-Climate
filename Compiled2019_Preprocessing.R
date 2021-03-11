@@ -207,340 +207,64 @@ write.csv(otu_table(CB16S), "18Sotu.csv")
 
 ```{r}
 #FILTER OTU TABLES
-#16S, filter samples for analysis
-#To make comparisons between needle types for each date.
+#16S, filter out positive, negative, and excess samples we do not need
 CB16_Pos=subset_samples(CB_16S, Needle =="Positive")
 CB16_NoPos=subset_samples(CB_16S, (Needle !="Positive")&(Needle != "Blank")&(Needle != "Spruce"))
+CB16Paper2= subset_samples(CB16_NoPos, (Needle !="Red")&(Needle != "2Red")&(Needle != "Shade")&(Horizon !="Bot")&(Elevation !="NO"))
+#Filter samples by site location
 CB16_LM = subset_samples(CB_16S, Location == "Lower Montane") 
-CB16_LM = subset_samples(CB_16S,(Location != "Upper Subalpine")&(Location != "Lower Subalpine")&(Location != "Positive")&(Location != "Blank")&(Location != "Negative"))
 CB16_LS = subset_samples(CB_16S, Location == "Lower Subalpine")
 CB16_US = subset_samples(CB_16S, Location == "Upper Subalpine")
-
-CB16Paper2= subset_samples(CB16_NoPos, (Needle !="Red")&(Needle != "2Red")&(Needle != "Shade")&(Horizon !="Bot")&(Elevation !="NO"))
-
-CB16_Green_Lodge_Control=subset_samples(CB16_NoPos, (Needle !="Red")&(Needle != "2Red")&(Needle != "Shade"))
-
-CB16_LS_induced = subset_samples(CB16_LS, Snowmelt == "Induced")
-CB16_LS_regular = subset_samples(CB16_LS, Snowmelt == "Regular")
-CB16_LS_spruce = subset_samples(CB16_LS, Date == "g_Seven")
-CB16_LS_spruce2 = subset_samples(CB16_LS_spruce, (Snowmelt !="Induced"))
-
-CB16_LS_Compare = subset_samples(CB16_LS, (Needle !="Red")&(Needle != "2Red")&(Horizon !="Bot"))
-CB16_LS_Compare1 = subset_samples(CB16_LS_Compare, Date == "a_One")
-CB16_LS_Compare2 = subset_samples(CB16_LS_Compare, Date == "b_Twp")
-CB16_LS_Compare3 = subset_samples(CB16_LS_Compare, Date == "c_Three")
-CB16_LS_Compare4 = subset_samples(CB16_LS_Compare, Date == "d_Four")
-CB16_LS_Compare5 = subset_samples(CB16_LS_Compare, Date == "e_Five")
-CB16_LS_Compare6 = subset_samples(CB16_LS_Compare, Date == "f_Six")
-CB16_LS_Compare7 = subset_samples(CB16_LS_Compare, Date == "g_Seven")
-
-##Subsets made to analyze all the 16S samples for the First paper that only looks at LM and LS_regular
-#Kristin's code
-CB16_FirstPaper=subset_samples(CB_16S,(Location != "Upper Subalpine")&(Needle != "2Red")&(Snowmelt != "Induced"))
-CB16_LS_induced_nobot = subset_samples(CB16_LS, Horizon == "Top")
-CB16_LS_reg_nobot = subset_samples(CB16_LS_regular, Horizon == "Top")
-CB_16S_nodups= subset_samples(CB16_LS_reg_nobot, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-LS_16S_Flux= subset_samples(CB_16S_nodups, (Date !="c_Three")&(Date !="f_Six"))
-LS_16S_Flux_Edits= subset_samples(LS_16S_Flux, (Sample !="LS.C4.08.02.2017")&(Sample !="LS.L4.08.02.2017")&(Sample !="LS.SH1.10.25.2018")&(Sample !="LS.SH2.10.25.2018")&(Sample !="LS.SH3.10.25.2018")&(Sample !="LS.G4.08.02.2017"))
-samples =sample.names(LS_16S_Flux_Edits)
-write.csv(samples, "samplers.csv")
-
-CB_16S_nodubs= subset_samples(CB16_NoPos, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-Paper2_16S= subset_samples(CB_16S_nodubs, (Needle !="Red")&(Date !="2Red"))
-
-CB16_LS_ind_nobot = subset_samples(CB16_LS_induced, Horizon == "Top")
-CB_16S_nodups_SM= subset_samples(CB16_LS_ind_nobot, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-LS_16S_Flux_SM= subset_samples(CB_16S_nodups_SM, (Date !="c_Three")&(Date !="f_Six"))
-LS_16S_Flux_Edits_SM= subset_samples(LS_16S_Flux_SM, (Sample !="LS.2XR2.SM.7.19.2018")&(Sample !="LS.2XR3.SM.7.19.2018")&(Sample !="LS.2XR4.SM.08.02.2017")&(Sample !="LS.2XR4.SM.7.19.2018")&(Sample !="LS.C4.SM.08.02.2017")&(Sample !="LS.G4.SM.08.02.2017")&(Sample !="LS.L4.SM.08.02.2017")&(Sample !="LS.R3.SM.10.25.2018")&(Sample !="LS.R4.SM.08.02.2017")&(Sample !="LS.SH1.SM.10.25.2018")&(Sample !="LS.SH2.SM.10.25.2018")&(Sample !="LS.SH3.SM.10.25.2018"))
-samples =sample.names(LS_16S_Flux_Edits_SM)
-write.csv(samples, "samplers.csv")
-
-LS_16S_micro_SM= subset_samples(CB16_LS_ind_nobot, (Date !="d_Four")&(Date !="f_Six")&(Date !="g_Seven"))
-LS_16S_micro_Edits_SM= subset_samples(LS_16S_micro_SM, (Sample !="LS.R1.SM.05.26.2018")&(Sample !="E12.10.14.17"))
-samples =sample.names(LS_16S_micro_Edits_SM)
-write.csv(samples, "samplers.csv")
-LS_16S_micro_Edits_SM_Date= subset_samples(LS_16S_micro_SM, Date=="b_Two")
-sample.names(LS_16S_micro_Edits_SM_Date)
-
-
-#Remove 2xRed
-CB16_LSreg_No_2Red = subset_samples(CB16_LS_regular , (Needle != "2Red"))
-CB16_LSreg_No_2Redorbot = subset_samples(CB16_LSreg_No_2Red , (Horizon != "Bot"))
-CB16_LS_no2red_bot_dubs=subset_samples(CB16_LSreg_No_2Redorbot, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-CB16_LSreg_No_2Redorbotcontrol = subset_samples(CB16_LSreg_No_2Redorbot , (Needle != "Control"))
-
-#Remove 2xRed
-CB16_LSreg_No_2Red_SM = subset_samples(CB16_LS_induced , (Needle != "2Red"))
-CB16_LSreg_No_2Redorbot_SM = subset_samples(CB16_LSreg_No_2Red_SM , (Horizon != "Bot"))
-CB16_LS_no2red_bot_dubs_SM=subset_samples(CB16_LSreg_No_2Redorbot_SM, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-CB16_LSreg_No_2Redorbotcontrol_SM = subset_samples(CB16_LSreg_No_2Redorbot_SM , (Needle != "Control"))
-
-CB16_LM_nobotordubs = subset_samples(CB16_LM , (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="A3.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-CB16_LM_Microclimate=subset_samples(CB16_LM_nobotordubs, (Date !="f_Six")&(Date !="g_Seven"))
-CB16_US_nobotordubs = subset_samples(CB16_US , (Horizon != "Bot"), (Sample!="G7.10.14.17"))
-
-CB16_LM_Paper2=subset_samples(CB16_LM_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
-CB16_LS_Paper2=subset_samples(CB16_LS_no2red_bot_dubs, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
-CB16_LS_SM_Paper2=subset_samples(CB16_LS_no2red_bot_dubs_SM, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
-CB16_US_Paper2=subset_samples(CB16_US_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
-##Let's just look at the controls
-####
-CB16_LM_Paper2=subset_samples(CB16_LM_nobotordubs, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-CB16_LS_Paper2=subset_samples(CB16_LS_no2red_bot_dubs, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-CB16_LS_SM_Paper2=subset_samples(CB16_LS_no2red_bot_dubs_SM, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-CB16_US_Paper2=subset_samples(CB16_US_nobotordubs, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-#Let's just look at the needles
-###
-CB16_LM_Paper2=subset_samples(CB16_LM_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Needle !="Lodge")&(Horizon !="Bot"))
-CB16_LS_Paper2=subset_samples(CB16_LS_no2red_bot_dubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Lodge")&(Needle !="Control")&(Horizon !="Bot"))
-CB16_LS_SM_Paper2=subset_samples(CB16_LS_no2red_bot_dubs_SM, (Needle !="Red")&(Needle !="Shade")&(Needle !="Lodge")&(Needle !="Control")&(Horizon !="Bot"))
-CB16_US_Paper2=subset_samples(CB16_US_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Lodge")&(Needle !="Control")&(Horizon !="Bot"))
-
-LMOne=subset_samples(CB16_LM_Paper2, Date=="a_One")
-LMTwo=subset_samples(CB16_LM_Paper2, Date=="b_Two")
-LMThree=subset_samples(CB16_LM_Paper2, Date=="c_Three")
-LMFour=subset_samples(CB16_LM_Paper2, Date=="d_Four")
-LMFive=subset_samples(CB16_LM_Paper2, Date=="e_Five")
-LMSix=subset_samples(CB16_LM_Paper2, Date=="f_Six")
-LMSeven=subset_samples(CB16_LM_Paper2, Date=="g_Seven")
-
-SMOne=subset_samples(CB16_LS_SM_Paper2, Date=="a_One")
-SMTwo=subset_samples(CB16_LS_SM_Paper2, Date=="b_Two")
-SMThree=subset_samples(CB16_LS_SM_Paper2, Date=="c_Three")
-SMFour=subset_samples(CB16_LS_SM_Paper2, Date=="d_Four")
-SMFive=subset_samples(CB16_LS_SM_Paper2, Date=="e_Five")
-SMSix=subset_samples(CB16_LS_SM_Paper2, Date=="f_Six")
-SMSeven=subset_samples(CB16_LS_SM_Paper2, Date=="g_Seven")
-
-LSOne=subset_samples(CB16_LS_Paper2, Date=="a_One")
-LSTwo=subset_samples(CB16_LS_Paper2, Date=="b_Two")
-LSThree=subset_samples(CB16_LS_Paper2, Date=="c_Three")
-LSFour=subset_samples(CB16_LS_Paper2, Date=="d_Four")
-LSFive=subset_samples(CB16_LS_Paper2, Date=="e_Five")
-LSSix=subset_samples(CB16_LS_Paper2, Date=="f_Six")
-LSSeven=subset_samples(CB16_LS_Paper2, Date=="g_Seven")
-
-USOne=subset_samples(CB16_US_Paper2, Date=="a_One")
-USTwo=subset_samples(CB16_US_Paper2, Date=="b_Two")
-USThree=subset_samples(CB16_US_Paper2, Date=="c_Three")
-USFour=subset_samples(CB16_US_Paper2, Date=="d_Four")
-USFive=subset_samples(CB16_US_Paper2, Date=="e_Five")
-USSix=subset_samples(CB16_US_Paper2, Date=="f_Six")
-USSeven=subset_samples(CB16_US_Paper2, Date=="g_Seven")
-
-#To make comparisons between needle types for each date.
-CB16LS_4= subset_samples(CB16_LS_no2red_bot_dubs, Date=="d_Four")
-CB16LS_4_Needles= subset_samples(CB16LS_4, Type=="Needle")
-CB16LS_4_Spruce= subset_samples(CB16LS_4_Needles, TreeSpecies=="Spruce")
-CB16LS_4_Lodge= subset_samples(CB16LS_4_Needles, TreeSpecies=="Lodge")
-CB16LS_4_Control= subset_samples(CB16LS_4, TreeSpecies=="Control")
-CB16LS_3= subset_samples(CB16_LS_no2red_bot_dubs, Date=="c_Three")
-CB16LS_5= subset_samples(CB16_LS_no2red_bot_dubs, Date=="e_Five")
-CB16LS_2= subset_samples(CB16_LS_no2red_bot_dubs, Date=="b_Two")
-CB16LS_1= subset_samples(CB16_LS_no2red_bot_dubs, Date=="a_One")
-CB16LS_1_Needles= subset_samples(CB16LS_1, Type=="Needle")
-CB16LS_1_Spruce= subset_samples(CB16LS_1_Needles, TreeSpecies=="Spruce")
-
-SM_Needle=subset_samples(CB16_LS_no2red_bot_dubs_SM, (Needle !="Red")&(Needle !="Shade"))
-CB16LS_4_SM= subset_samples(SM_Needle, Date=="d_Four")
-CB16LS_3_SM= subset_samples(SM_Needle, Date=="c_Three")
-CB16LS_5_SM= subset_samples(SM_Needle, Date=="e_Five")
-CB16LS_2_SM= subset_samples(SM_Needle, Date=="b_Two")
-CB16LS_1_SM= subset_samples(SM_Needle, Date=="a_One")
-CB16LS_5_SM= subset_samples(SM_Needle, Date=="e_Five")
-CB16LS_6_SM= subset_samples(SM_Needle, Date=="f_Six")
-CB16LS_7_SM= subset_samples(SM_Needle, Date=="g_Seven")
-
-LS_Needle=subset_samples(CB16_LS_no2red_bot_dubs, (Needle !="Red")&(Needle !="Shade"))
-#To make comparisons between needle types for each date.
-CB16LS_4= subset_samples(LS_Needle, Date=="d_Four")
-CB16LS_3= subset_samples(LS_Needle, Date=="c_Three")
-CB16LS_5= subset_samples(LS_Needle, Date=="e_Five")
-CB16LS_2= subset_samples(LS_Needle, Date=="b_Two")
-CB16LS_1= subset_samples(LS_Needle, Date=="a_One")
-CB16LS_6= subset_samples(LS_Needle, Date=="f_Six")
-CB16LS_6= subset_samples(LS_Needle, Date=="g_Seven")
-
-LM_Needle=subset_samples(CB16_LM_nobotordubs, (Needle !="Red")&(Needle !="Shade"))
-
-#To make comparisons between needle types for each date.
-CB16LM_4= subset_samples(LM_Needle, Date=="d_Four")
-CB16LM_3= subset_samples(LM_Needle, Date=="c_Three")
-CB16LM_5= subset_samples(LM_Needle, Date=="e_Five")
-CB16LM_2= subset_samples(LM_Needle, Date=="b_Two")
-CB16LM_1= subset_samples(LM_Needle, Date=="a_One")
-CB16LM_6= subset_samples(LM_Needle, Date=="f_Six")
-CB16LM_6= subset_samples(LM_Needle, Date=="g_Seven")
-
-US_Needle=subset_samples(CB16_US_nobotordubs, (Needle !="Red")&(Needle !="Shade"))
-#To make comparisons between needle types for each date.
-CB16US_4= subset_samples(US_Needle, Date=="d_Four")
-CB16US_3= subset_samples(US_Needle, Date=="c_Three")
-CB16US_2= subset_samples(US_Needle, Date=="b_Two")
-CB16US_1= subset_samples(US_Needle, Date=="a_One")
-CB16US_5= subset_samples(US_Needle, Date=="e_Five")
-CB16US_6= subset_samples(US_Needle, Date=="f_Six")
-CB16US_6= subset_samples(US_Needle, Date=="g_Seven")
-
-#To make comparisons between dates for each needle type.
-CB16LS_Red= subset_samples(CB16_LS, (Needle=="Red")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Green= subset_samples(CB16_LS, (Needle=="Green")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Lodge= subset_samples(CB16_LS, (Needle=="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Control= subset_samples(CB16_LS, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
-
-
-#To make comparisons between dates for each needle type.
-CB16LS_Red= subset_samples(CB16_LS_regular, (Needle=="Red")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Green= subset_samples(CB16_LS_regular, (Needle=="Green")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Lodge= subset_samples(CB16_LS_regular, (Needle=="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Control= subset_samples(CB16_LS_regular, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
-
-LS16_Control_2017=subset_samples(CB16LS_Control, Year=="a_2017")
-LS16_Control_2018=subset_samples(CB16LS_Control, Year=="b_2018")
-LS16_Control_2019=subset_samples(CB16LS_Control, Year=="c_2019")
-
-LS16_Green_2017=subset_samples(CB16LS_Green, Year=="a_2017")
-LS16_Green_2018=subset_samples(CB16LS_Green, Year=="b_2018")
-LS16_Green_2019=subset_samples(CB16LS_Green, Year=="c_2019")
-
-LS16_Lodge_2017=subset_samples(CB16LS_Lodge, Year=="a_2017")
-LS16_Lodge_2018=subset_samples(CB16LS_Lodge, Year=="b_2018")
-LS16_Lodge_2019=subset_samples(CB16LS_Lodge, Year=="c_2019")
-
-#To make comparisons between dates for each needle type.
-CB16LS_Red_SM= subset_samples(CB16_LS_induced, (Needle=="Red")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Green_SM= subset_samples(CB16_LS_induced, (Needle=="Green")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Lodge_SM= subset_samples(CB16_LS_induced, (Needle=="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
-CB16LS_Control_SM= subset_samples(CB16_LS_induced, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
-
-LS16_Control_2017_SM=subset_samples(CB16LS_Control_SM, Year=="a_2017")
-LS16_Control_2018_SM=subset_samples(CB16LS_Control_SM, Year=="b_2018")
-LS16_Control_2019_SM=subset_samples(CB16LS_Control_SM, Year=="c_2019")
-
-LS16_Green_2017_SM=subset_samples(CB16LS_Green_SM, Year=="a_2017")
-LS16_Green_2018_SM=subset_samples(CB16LS_Green_SM, Year=="b_2018")
-LS16_Green_2019_SM=subset_samples(CB16LS_Green_SM, Year=="c_2019")
-
-LS16_Lodge_2017_SM=subset_samples(CB16LS_Lodge_SM, Year=="a_2017")
-LS16_Lodge_2018_SM=subset_samples(CB16LS_Lodge_SM, Year=="b_2018")
-LS16_Lodge_2019_SM=subset_samples(CB16LS_Lodge_SM, Year=="c_2019")
-
-CB16LS_Red_SM= subset_samples(CB16_LS_no2red_bot_dubs_SM, Needle=="Red")
-CB16LS_Green_SM= subset_samples(CB16_LS_no2red_bot_dubs_SM, Needle=="Green")
-CB16LS_Lodge_SM= subset_samples(CB16_LS_no2red_bot_dubs_SM, Needle=="Lodge")
-CB16LS_Control_SM= subset_samples(CB16_LS_no2red_bot_dubs_SM, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge"))
-
-#To make comparisons between dates for each needle type.
-CB16LM_Red= subset_samples(CB16_LM, (Needle=="Red")&(Horizon !="Bot"))
+#_______________Lower_______________#
+#Specifiy sample types for Lower
 CB16LM_Green= subset_samples(CB16_LM, (Needle=="Green")&(Horizon !="Bot"))
 CB16LM_Lodge= subset_samples(CB16_LM, (Needle=="Lodge")&(Horizon !="Bot"))
 CB16LM_Control= subset_samples(CB16_LM, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-
+#Specify year for each sample type at the Lower site
 LM16_Control_2017=subset_samples(CB16LM_Control, Year=="a_2017")
 LM16_Control_2018=subset_samples(CB16LM_Control, Year=="b_2018")
 LM16_Control_2019=subset_samples(CB16LM_Control, Year=="c_2019")
-
 LM16_Green_2017=subset_samples(CB16LM_Green, Year=="a_2017")
 LM16_Green_2018=subset_samples(CB16LM_Green, Year=="b_2018")
 LM16_Green_2019=subset_samples(CB16LM_Green, Year=="c_2019")
-
 LM16_Lodge_2017=subset_samples(CB16LM_Lodge, Year=="a_2017")
 LM16_Lodge_2018=subset_samples(CB16LM_Lodge, Year=="b_2018")
 LM16_Lodge_2019=subset_samples(CB16LM_Lodge, Year=="c_2019")
-
-#To make comparisons between dates for each needle type.
-CB16US_Red= subset_samples(CB16_US, (Needle=="Red")&(Horizon !="Bot"))
+#_______________Midddle_______________#
+#Specify snowmelt plots at the Middle site
+CB16_LS_induced = subset_samples(CB16_LS, Snowmelt == "Induced")
+CB16_LS_regular = subset_samples(CB16_LS, Snowmelt == "Regular")
+#Specifiy sample types for Middle
+CB16LS_Green= subset_samples(CB16_LS_regular, (Needle=="Green")&(Horizon !="Bot")&(Needle !="2Red"))
+CB16LS_Lodge= subset_samples(CB16_LS_regular, (Needle=="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
+CB16LS_Control= subset_samples(CB16_LS_regular, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot")&(Needle !="2Red"))
+#Specify year for each sample type at the Middle site
+LS16_Control_2017=subset_samples(CB16LS_Control, Year=="a_2017")
+LS16_Control_2018=subset_samples(CB16LS_Control, Year=="b_2018")
+LS16_Control_2019=subset_samples(CB16LS_Control, Year=="c_2019")
+LS16_Green_2017=subset_samples(CB16LS_Green, Year=="a_2017")
+LS16_Green_2018=subset_samples(CB16LS_Green, Year=="b_2018")
+LS16_Green_2019=subset_samples(CB16LS_Green, Year=="c_2019")
+LS16_Lodge_2017=subset_samples(CB16LS_Lodge, Year=="a_2017")
+LS16_Lodge_2018=subset_samples(CB16LS_Lodge, Year=="b_2018")
+LS16_Lodge_2019=subset_samples(CB16LS_Lodge, Year=="c_2019")
+#_______________Upper_______________#
+#Specifiy sample types for Upper
 CB16US_Green= subset_samples(CB16_US, (Needle=="Green")&(Horizon !="Bot"))
 CB16US_Lodge= subset_samples(CB16_US, (Needle=="Lodge")&(Horizon !="Bot"))
 CB16US_Control= subset_samples(CB16_US, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-sample_sums(CB16US_Red)
-
+#Specify year for each sample type at the Upper site
 US16_Control_2017=subset_samples(CB16US_Control, Year=="a_2017")
 US16_Control_2018=subset_samples(CB16US_Control, Year=="b_2018")
 US16_Control_2019=subset_samples(CB16US_Control, Year=="c_2019")
-
 US16_Green_2017=subset_samples(CB16US_Green, Year=="a_2017")
 US16_Green_2018=subset_samples(CB16US_Green, Year=="b_2018")
 US16_Green_2019=subset_samples(CB16US_Green, Year=="c_2019")
-
 US16_Lodge_2017=subset_samples(CB16US_Lodge, Year=="a_2017")
 US16_Lodge_2018=subset_samples(CB16US_Lodge, Year=="b_2018")
 US16_Lodge_2019=subset_samples(CB16US_Lodge, Year=="c_2019")
 
 
-CB16_Red = subset_samples(CB_16S, Needle == "Red") 
-CB16_Green = subset_samples(CB_16S, Needle == "Green")
-CB16_Lodge = subset_samples(CB_16S, Needle == "Lodge")
-CB16_Control = subset_samples(CB_16S, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Needle !="2Red"))
-
-CB16_red_nobot_dubs=subset_samples(CB16_Red, (Horizon !="Bot")&(Sample !="A3.10.14.17")&(Sample !="C10.10.14.17")&(Type !="Positive"))
-CB16_green_nobot_dubs=subset_samples(CB16_Green, (Horizon !="Bot")&(Sample !="E12.10.14.17")&(Sample !="G7.10.14.17")&(Type !="Positive"))
-CB16_lodge_nobot_dubs=subset_samples(CB16_Lodge, (Horizon !="Bot")&(Type !="Positive"))
-CB16_control_nobot_dubs=subset_samples(CB16_Control, (Horizon !="Bot")&(Sample !="F8.10.14.17")&(Sample !="C4.10.14.17")&(Type !="Positive"))
-
-CB16_red_nobot_dubs=subset_samples(CB16_Red, (Horizon !="Bot")&(Sample !="A3.10.14.17")&(Sample !="C10.10.14.17")&(Type !="Positive"))
-CB16_green_nobot_dubs=subset_samples(CB16_Green, (Horizon !="Bot")&(Sample !="E12.10.14.17")&(Sample !="G7.10.14.17")&(Type !="Positive"))
-CB16_control_nobot_dubs=subset_samples(CB16_Control, (Horizon !="Bot")&(Sample !="F8.10.14.17")&(Sample !="C4.10.14.17")&(Type !="Positive"))
-
-#All locations (4), for each specific date
-CB16_nopos=subset_samples(CB_16S, (Sample !="Positive")&(Sample !="A3.10.14.17")&(Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17")&(Sample !="G7.10.14.17"))
-
-CB16_1=subset_samples(CB16_nopos, Date=="a_One")
-CB16_2=subset_samples(CB16_nopos, Date=="b_Two")
-CB16_3=subset_samples(CB16_nopos, Date=="c_Three")
-CB16_4=subset_samples(CB16_nopos, Date=="d_Four")
-CB16_5=subset_samples(CB16_nopos, Date=="e_Five")
-
-CB16_lodge_1=subset_samples(CB16_lodge_nobot_dubs, Date=="a_One")
-CB16_lodge_2=subset_samples(CB16_lodge_nobot_dubs, Date=="b_Two")
-CB16_lodge_3=subset_samples(CB16_lodge_nobot_dubs, Date=="c_Three")
-CB16_lodge_4=subset_samples(CB16_lodge_nobot_dubs, Date=="d_Four")
-CB16_lodge_5=subset_samples(CB16_lodge_nobot_dubs, Date=="e_Five")
-
-CB16_control_1=subset_samples(CB16_control_nobot_dubs, Date=="a_One")
-CB16_control_2=subset_samples(CB16_control_nobot_dubs, Date=="b_Two")
-CB16_control_3=subset_samples(CB16_control_nobot_dubs, Date=="c_Three")
-CB16_control_4=subset_samples(CB16_control_nobot_dubs, Date=="d_Four")
-CB16_control_5=subset_samples(CB16_control_nobot_dubs, Date=="e_Five")
-
-#You need to change mapping file so that you can compare just Lower Montane and Induced Lower Subalpine across dates. Add moisture data while you're at it. 
-CB_Red_Snowmelt=subset_samples(CB16_red_nobot_dubs, (Location !="Upper Subalpine")&(Elevation !="LS"))
-CB_Green_Snowmelt=subset_samples(CB16_green_nobot_dubs, (Location !="Upper Subalpine")&(Elevation !="LS"))
-CB_Lodge_Snowmelt=subset_samples(CB16_lodge_nobot_dubs, (Location !="Upper Subalpine")&(Elevation !="LS"))
-CB_Control_Snowmelt=subset_samples(CB16_control_nobot_dubs, (Location !="Upper Subalpine")&(Elevation !="LS"))
-CB_Control_Snowmelt_1=subset_samples(CB_Control_Snowmelt, Date=="a_One")
-CB_Control_Snowmelt_3=subset_samples(CB_Control_Snowmelt, Date=="c_Three")
-CB_Control_Snowmelt_4=subset_samples(CB_Control_Snowmelt, Date=="d_Four")
-
-CB_Lodge_Snowmelt_1=subset_samples(CB_Lodge_Snowmelt, Date=="a_One")
-CB_Lodge_Snowmelt_2=subset_samples(CB_Lodge_Snowmelt, Date=="b_Two")
-CB_Lodge_Snowmelt_3=subset_samples(CB_Lodge_Snowmelt, Date=="c_Three")
-CB_Lodge_Snowmelt_4=subset_samples(CB_Lodge_Snowmelt, Date=="d_Four")
-CB_Lodge_Snowmelt_5=subset_samples(CB_Lodge_Snowmelt, Date=="e_Five")
-
-CB_3=subset_samples(CB_16S, Date=="c_Three")
-CB_3_Snowmelt=subset_samples(CB_3, (Location !="Upper Subalpine")&(Elevation !="LS")&(Horizon !="Bot")&(Needle != "2Red")&(Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17")&(Sample !="A3.10.14.17"))
-
-sample_sums(CB_4)
-CB_4=subset_samples(CB_16S, Date=="d_Four")
-CB_4_Snowmelt=subset_samples(CB_4, (Location !="Upper Subalpine")&(Elevation !="LS")&(Horizon !="Bot")&(Needle != "2Red")&(Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17")&(Sample !="A3.10.14.17"))
-
-CB_5=subset_samples(CB_16S, Date=="e_Five")
-CB_5_Snowmelt=subset_samples(CB_5, (Location !="Upper Subalpine")&(Elevation !="LS")&(Horizon !="Bot")&(Needle != "2Red")&(Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17")&(Sample !="A3.10.14.17"))
-
-CB_1=subset_samples(CB_16S, Date=="a_One")
-CB_1_Snowmelt=subset_samples(CB_1, (Location !="Upper Subalpine")&(Elevation !="LS")&(Horizon !="Bot")&(Needle != "2Red")&(Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17")&(Sample !="A3.10.14.17"))
-
-CB_2=subset_samples(CB_16S, Date=="b_Two")
-CB_2_Snowmelt=subset_samples(CB_1, (Location !="Upper Subalpine")&(Elevation !="LS")&(Horizon !="Bot")&(Needle != "2Red")&(Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17")&(Sample !="A3.10.14.17"))
-
-CB_LSRed=subset_samples(CB16_red_nobot_dubs, (Location !="Upper Subalpine")&(Location !="Lower Montane"))
-CB_LSGreen=subset_samples(CB16_green_nobot_dubs, (Location !="Upper Subalpine")&(Location !="Lower Montane"))
-CB_LSLodge=subset_samples(CB16_lodge_nobot_dubs, (Location !="Upper Subalpine")&(Location !="Lower Montane"))
-CB_LSControl=subset_samples(CB16_control_nobot_dubs, (Location !="Upper Subalpine")&(Location !="Lower Montane"))
-
-
-sample_sums(CB_3_Snowmelt)
 
 ```
 
@@ -560,97 +284,6 @@ CB18_LS_regular = subset_samples(CB18_LS, Snowmelt == "Regular")
 CB_18S_nodubs= subset_samples(CB18_NoPos, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
 Paper2_18S= subset_samples(CB_18S_nodubs, (Needle !="Red")&(Date !="2Red"))
 
-
-##Subsets made to analyze all the 16S samples for the First paper that only looks at LM and LS_regular
-#Kristin's code
-CB18_FirstPaper=subset_samples(CB_18S,(Location != "Upper Subalpine")&(Needle != "2Red")&(Snowmelt != "Induced"))
-
-CB18_LS_induced_nobot = subset_samples(CB18_LS, Horizon == "Top")
-CB18_LS_reg_nobot = subset_samples(CB18_LS, Horizon == "Top")
-#Remove 2xRed
-CB18_LSreg_No_2Red = subset_samples(CB18_LS_regular , (Needle != "2Red"))
-CB18_LSreg_No_2Redorbot = subset_samples(CB18_LSreg_No_2Red , (Horizon != "Bot"))
-CB18_LSreg_No_2Redorbotcontrol = subset_samples(CB18_LSreg_No_2Redorbot , (Needle != "Control"))
-CB18_LS_no2red_bot_dubs=subset_samples(CB18_LSreg_No_2Redorbot, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-CB18LS_Shade= subset_samples(CB18_LS_regular, Needle=="Shade")
-
-CB18_LM_nobotordubs = subset_samples(CB18_LM , (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="A3.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-
-CB18_LSreg_No_2Red = subset_samples(CB18_LS_regular , (Needle != "2Red"))
-CB18_LSreg_No_2Redorbot = subset_samples(CB18_LSreg_No_2Red , (Horizon != "Bot"))
-CB18_LS_no2red_bot_dubs=subset_samples(CB18_LSreg_No_2Redorbot, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-
-CB18_LSreg_No_2Red_SM = subset_samples(CB18_LS_induced , (Needle != "2Red"))
-CB18_LSreg_No_2Redorbot_SM = subset_samples(CB18_LSreg_No_2Red_SM , (Horizon != "Bot"))
-CB18_LS_no2red_bot_dubs_SM=subset_samples(CB18_LSreg_No_2Redorbot_SM, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-
-CB18_US_nobotordubs = subset_samples(CB18_US , (Horizon != "Bot"), (Sample!="G7.10.14.17"))
-
-##Let's just look at the controls
-####
-CB18_LM_Paper2=subset_samples(CB18_LM_nobotordubs, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-CB18_LS_Paper2=subset_samples(CB18_LS_no2red_bot_dubs, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-CB18_LS_SM_Paper2=subset_samples(CB18_LS_no2red_bot_dubs_SM, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-CB18_US_Paper2=subset_samples(CB18_US_nobotordubs, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
-#Let's just look at the needles
-###
-CB18_LM_Paper2=subset_samples(CB18_LM_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
-CB18_LS_Paper2=subset_samples(CB18_LS_no2red_bot_dubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
-CB18_LS_SM_Paper2=subset_samples(CB18_LS_no2red_bot_dubs_SM, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
-CB18_US_Paper2=subset_samples(CB18_US_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
-
-LMOne=subset_samples(CB18_LM_Paper2, Date=="a_One")
-LMTwo=subset_samples(CB18_LM_Paper2, Date=="b_Two")
-LMThree=subset_samples(CB18_LM_Paper2, Date=="c_Three")
-LMFour=subset_samples(CB18_LM_Paper2, Date=="d_Four")
-LMFive=subset_samples(CB18_LM_Paper2, Date=="e_Five")
-LMSix=subset_samples(CB18_LM_Paper2, Date=="f_Six")
-LMSeven=subset_samples(CB18_LM_Paper2, Date=="g_Seven")
-
-SMOne=subset_samples(CB18_LS_SM_Paper2, Date=="a_One")
-SMTwo=subset_samples(CB18_LS_SM_Paper2, Date=="b_Two")
-SMThree=subset_samples(CB18_LS_SM_Paper2, Date=="c_Three")
-SMFour=subset_samples(CB18_LS_SM_Paper2, Date=="d_Four")
-SMFive=subset_samples(CB18_LS_SM_Paper2, Date=="e_Five")
-SMSix=subset_samples(CB18_LS_SM_Paper2, Date=="f_Six")
-SMSeven=subset_samples(CB18_LS_SM_Paper2, Date=="g_Seven")
-
-LSOne=subset_samples(CB18_LS_Paper2, Date=="a_One")
-LSTwo=subset_samples(CB18_LS_Paper2, Date=="b_Two")
-LSThree=subset_samples(CB18_LS_Paper2, Date=="c_Three")
-LSFour=subset_samples(CB18_LS_Paper2, Date=="d_Four")
-LSFive=subset_samples(CB18_LS_Paper2, Date=="e_Five")
-LSSix=subset_samples(CB18_LS_Paper2, Date=="f_Six")
-LSSeven=subset_samples(CB18_LS_Paper2, Date=="g_Seven")
-
-USOne=subset_samples(CB18_US_Paper2, Date=="a_One")
-USTwo=subset_samples(CB18_US_Paper2, Date=="b_Two")
-USThree=subset_samples(CB18_US_Paper2, Date=="c_Three")
-USFour=subset_samples(CB18_US_Paper2, Date=="d_Four")
-USFive=subset_samples(CB18_US_Paper2, Date=="e_Five")
-USSix=subset_samples(CB18_US_Paper2, Date=="f_Six")
-USSeven=subset_samples(CB18_US_Paper2, Date=="g_Seven")
-
-
-
-CB18LS_4= subset_samples(CB18_LS_no2red_bot_dubs, Date=="d_Four")
-CB18LS_3= subset_samples(CB18_LS_no2red_bot_dubs, Date=="c_Three")
-CB18LS_5= subset_samples(CB18_LS_no2red_bot_dubs, Date=="e_Five")
-CB18LS_2= subset_samples(CB18_LS_no2red_bot_dubs, Date=="b_Two")
-CB18LS_1= subset_samples(CB18_LS_no2red_bot_dubs, Date=="a_One")
-
-CB18LS_Red= subset_samples(CB18_LS_no2red_bot_dubs, Needle=="Red")
-CB18LS_Green= subset_samples(CB18_LS_no2red_bot_dubs, Needle=="Green")
-CB18LS_Lodge= subset_samples(CB18_LS_no2red_bot_dubs, Needle=="Lodge")
-CB18LS_Control= subset_samples(CB18_LS_no2red_bot_dubs, Needle=="Control")
-
-CB18_LM_nobotordubs = subset_samples(CB18_LM , (Horizon != "Bot"), (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-
-CB18LM_4= subset_samples(CB18_LM_nobotordubs, Date=="d_Four")
-CB18LM_3= subset_samples(CB18_LM_nobotordubs, Date=="c_Three")
-CB18LM_5= subset_samples(CB18_LM_nobotordubs, Date=="e_Five")
-CB18LM_2= subset_samples(CB18_LM_nobotordubs, Date=="b_Two")
-CB18LM_1= subset_samples(CB18_LM_nobotordubs, Date=="a_One")
 
 ```
 
