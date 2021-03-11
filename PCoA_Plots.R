@@ -1,5 +1,5 @@
 #This code is written with the libraries and mapping file Compiled2019MappingFile.txt are already loaded from the Compiled2019_Prerocessing.R and are recognized within the R environment. 
-
+#Let's determine the beta diversity metrics:
 #____________________________ Ordination for 16S Elevations___________________________________________#
 #Object to ordinate 16S DNA samples across all elevations
 ordu_we_16Paper2 = ordinate(CB16Paper2, "PCoA", "unifrac", weighted = TRUE)
