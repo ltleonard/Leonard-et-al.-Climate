@@ -1,4 +1,4 @@
-#This code is written with the libraries and mapping file Compiled2019MappingFile.txt are already loaded from the Compiled2019_Prerocessing.Rmd and are recognized within the R environment. 
+#This code is written with the libraries and mapping file Compiled2019MappingFile.txt are already loaded from the Compiled2019_Prerocessing.R and are recognized within the R environment. 
 
 #____________________________ Ordination for 16S Elevations___________________________________________#
 #Object to ordinate 16S DNA samples across all elevations
