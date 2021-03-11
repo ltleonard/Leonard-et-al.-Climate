@@ -1,0 +1,49 @@
+#Data was retrieved from the NWCC Report Generator: wcc.sc.egov.usda.gov/
+#Let's begin with Soil, which was available from 2006-2016.
+#Edit the daily data column, and change the dates to only the year in format: YYYY
+
+Max =read.table("Your_file_path",sep=',',header=TRUE)
+
+#Let's identify the data associated with each year.
+Max24 <- Max[(Max$DATE== "2006"),]
+Max25 <- Max[(Max$DATE== "2007"),]
+Max26 <- Max[(Max$DATE== "2008"),]
+Max27 <- Max[(Max$DATE== "2009"),]
+Max28 <- Max[(Max$DATE== "2010"),]
+Max29 <- Max[(Max$DATE== "2011"),]
+Max30 <- Max[(Max$DATE== "2012"),]
+Max31 <- Max[(Max$DATE== "2013"),]
+Max32 <- Max[(Max$DATE== "2014"),]
+Max33 <- Max[(Max$DATE== "2015"),]
+Max34 <- Max[(Max$DATE== "2016"),]
+
+#Omit any missing data.
+Max24NA <- na.omit(Max24)
+Max25NA <- na.omit(Max25)
+Max26NA <- na.omit(Max26)
+Max27NA <- na.omit(Max27)
+Max28NA <- na.omit(Max28)
+Max29NA <- na.omit(Max29)
+Max30NA <- na.omit(Max30)
+Max31NA <- na.omit(Max31)
+Max32NA <- na.omit(Max32)
+Max33NA <- na.omit(Max33)
+Max34NA <- na.omit(Max34)
+
+#We want to determine the total days per each year that the soil moisture (Labeled B380 in my file) is less than 10. 
+Y206<-sum(Max24NA$B380 <10)
+Y207<-sum(Max25NA$B380 <10)
+Y208<-sum(Max26NA$B380 <10)
+Y209<-sum(Max27NA$B380 <10)
+Y210<-sum(Max28NA$B380 <10)
+Y211<-sum(Max29NA$B380 <10)
+Y212<-sum(Max30NA$B380 <10)
+Y213<-sum(Max31NA$B380 <10)
+Y214<-sum(Max32NA$B380 <10)
+Y215<-sum(Max33NA$B380 <10)
+Y216<-sum(Max34NA$B380 <10)
+
+#View the results
+write.csv(list(Y83,Y84,Y85,Y86,Y87,Y88,Y89,Y90,Y91,Y92,Y93,Y94,Y95,Y96,Y97,Y98,Y99,Y200,Y201,Y202,Y203,Y204,Y205,Y206,Y207,Y208,Y209,Y210,Y211,Y212,Y213,Y214,Y215,Y216,Y217,Y218,Y219,Y220), "/Users/lleonard/Documents/R/list.csv") 
+
+
