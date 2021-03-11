@@ -1,21 +1,6 @@
-
+##This initial code for Filtering, Sequence variants, and Merging/ remove chimeras, taxonomic assignments is modified from Benjamin Callahan, "A DADA2 workflow for Big Data: Paired-end" https://benjjneb.github.io/dada2/bigdata_paired.html to work with my data. 
 ```{r}
-source('http://bioconductor.org/biocLite.R')
-biocLite('phyloseq')
-
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-BiocManager::install("dada2", version = "3.8")
-
-install.packages("vegan", repos="http://r-forge.r-project.org/")
-
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-BiocManager::install("DESeq2", version = "3.8")
-
-install.packages("Rmisc")
-
-
+#Load the necessary libraries for preprocessing and analysis:
 library(ggplot2)
 library(phyloseq); packageVersion("phyloseq")
 library(ShortRead)
@@ -32,48 +17,34 @@ theme_set(theme_bw())
 ```
 
 ```{r}
-pathF <- "/Users/lleonard/Documents/R/Compiled2019/Raw_F" #set path for forward reads
-pathR <- "/Users/lleonard/Documents/R/Compiled2019/Raw_R" #set path for reverse reads
+#Filtering raw files
+pathF <- "/FilePath/raw_data_F/" #set path for forward reads
+pathR <- "/FilePath/raw_data_R/" #set path for reverse reads
 filtpathF <- file.path(pathF, "filtered") # Filtered forward files go into the pathF/filtered/ subdirectory
 filtpathR <- file.path(pathR, "filtered") # ...
 fastqFs <- sort(list.files(pathF, pattern="fastq"))
 fastqRs <- sort(list.files(pathR, pattern="fastq"))
 if(length(fastqFs) != length(fastqRs)) stop("Forward and reverse files do not match.")
-# Filtering: THESE PARAMETERS ARENT OPTIMAL FOR ALL DATASETS
 #filterAndTrim(fwd=file.path(pathF, fastqFs), filt=file.path(filtpathF, fastqFs),
-# rev=file.path(pathR, fastqRs), filt.rev=file.path(filtpathR, fastqRs))
-
+             # rev=file.path(pathR, fastqRs), filt.rev=file.path(filtpathR, fastqRs))
 filterAndTrim(fwd=file.path(pathF, fastqFs), filt=file.path(filtpathF, fastqFs), rev=file.path(pathR, fastqRs), filt.rev=file.path(filtpathR, fastqRs), trimLeft = c(40,20), truncLen=c(239,250), maxEE=2, truncQ=2, maxN=0, compress=TRUE, verbose=TRUE)
-
-??filterAndTrim
-
 ```
 
 ```{r}
-#These show your quality scores. Green line needs to be ideally above 30. Blake says 20 is the minimum. 30= 99.99% 
-??plotQualityProfile
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.C1.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.C2.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.C3.09.20.2019_output_r1.fastq")
-#Bad quality
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.G2.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.G3.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.G4.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.L1.09.20.2019_output_r1.fastq")
-#Really bad quality
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.L3.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.L4.09.20.2019_output_r1.fastq")
-
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.C2.2.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.C3.2.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.G2.2.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.L1.2.09.20.2019_output_r1.fastq")
-plotQualityProfile("/Users/lleonard/Documents/R/Compiled2019/Merged_Input/LM.L3.2.09.20.2019_output_r1.fastq")
-
-#if things drop below 20 here, you want to cutt off in truncLen at the number on the x-axis (Cycle)
+#Analyze quality scores:
+#These show your quality scores. Score ideally is above 30 (and is in my case for most samples). 20 is the minimum. 
+plotQualityProfile(fnFs[[50]])
+plotQualityProfile(fnFs[[100]])
+plotQualityProfile(fnFs[[150]])
+plotQualityProfile(fnFs[[200]])
+plotQualityProfile(fnRs[[50]])
+plotQualityProfile(fnRs[[100]])
+plotQualityProfile(fnRs[[150]])
+plotQualityProfile(fnRs[[200]])
 ```
 
 ```{r}
+#Infer sequence variants
 library(dada2); packageVersion("dada2")
 # File parsing
 filtpathF <- "/Users/lleonard/Documents/R/Compiled2019/Raw_F/filtered" 
@@ -97,6 +68,8 @@ names(mergers) <- sample.names
 ```
 
 ```{r}
+#Sample inference and merger of paired-end reads
+#Here we will merge as 16S first
 for(sam in sample.names) {
   cat("Processing:", sam, "\n")
   derepF <- derepFastq(filtFs[[sam]])
@@ -109,7 +82,8 @@ for(sam in sample.names) {
 ```
 
 ```{r}
-# Sample inference and merger of paired-end reads
+#Sample inference and merger of paired-end reads
+#Here we will merge as 18S 
 mergers18 <- vector("list", length(sample.names))
 names(mergers18) <- sample.names
 for(sam in sample.names) {
@@ -120,37 +94,35 @@ for(sam in sample.names) {
   ddR <- dada(derepR, err=errR, multithread=TRUE)
   EukMerger <- mergePairs(ddF, derepF, ddR, derepR,maxMismatch = 0, minOverlap = 5, justConcatenate = TRUE, verbose=TRUE, returnRejects = FALSE)
   mergers18[[sam]] <- EukMerger
-  
-  write.csv(sample.names, "samplenames.csv")
 }
 ```
 
 ```{r}
-#When I ran seqtab I got a message "The sequences being tabled vary in length"", and it created a "int" instead of a large matrix? When I view the two objects they look the same, so I'm going to keep moving on, but this seems like a potential issue....
+#16S sequence table with chimeras removed
 seqtab <- makeSequenceTable(mergers)
-
-
+#18S sequence table with chimeras removed
 seqtab18 <- makeSequenceTable(mergers18)
 
-#saveRDS(seqtab, "/Users/lleonard/Documents/R/CB_Sequence123/seqtab.rds") 
-#saveRDS(seqtab18, "/Users/lleonard/Documents/R/CB_Sequence123/seqtab18.rds") 
+#Save files
+#saveRDS(seqtab, "/FilePath/seqtab.rds") 
+#saveRDS(seqtab18, "/FilePath/seqtab18.rds") 
 ```
 
-
 ```{r}
+#Remove chimeras, assign taxonomy
 library(dada2); packageVersion("dada2")
 # Merge multiple runs (if necessary)
-# Remove chimeras
+# Remove chimeras for 16S
 seqtab <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE)
-
+#Remove chimeras for 18S
 seqtab18 <- removeBimeraDenovo(seqtab18, method="consensus", multithread=TRUE)
-# Assign taxonomy
+# Assign taxonomy for 16S
 tax <- assignTaxonomy(seqtab, "/Users/lleonard/Documents/R/Compiled2019/silva_nr_v128_train_set.fa", multithread=TRUE)
-
+#Assign taxonomy for 18S
 tax18 <- assignTaxonomy(seqtab18, "/Users/lleonard/Documents/R/Compiled2019/silva_nr_v128_train_set.fa", multithread=TRUE)
 # Write to disk
-#saveRDS(seqtab, "/Users/lleonard/Documents/R/CB_Sequence123/seqtab_final.rds") # CHANGE ME to where you want sequence table saved
-#saveRDS(tax, "/Users/lleonard/Documents/R/CB_Sequence123/tax_final.rds") # CHANGE ME 
+#saveRDS(seqtab, "/FilePath/seqtab_final.rds") 
+#saveRDS(tax, "FilePath/tax_final.rds")
 ```
 
 ```{r}
@@ -166,38 +138,31 @@ uniquesToFasta(seqtab18, "18S_uniques.fasta", ids = a)
 ##save unique sequences to a file for use in alignment.16S
 a<-colnames(otu_table(seqtab, taxa_are_rows=FALSE))
 uniquesToFasta(seqtab, "16S_uniques.fasta", ids = a)
+##save unique sequences to a file for use in alignment. 18S
+a<-colnames(otu_table(seqtab18, taxa_are_rows=FALSE))
+uniquesToFasta(seqtab18, "18S_uniques.fasta", ids = a)
 ```
 #RUN QIIME CODE IN BETWEEN HERE TO GENERATE TRE FILE
 ```{r}
-#Load into phyloseq FOR 18S ## Forgot to run Qiime code for 18S, doing now. 2/25/20
-#ps <- phyloseq(otu_table(seqtab, taxa_are_rows=FALSE), tax_table(tax))
-#map <-read.csv("file.csv", sep=";", header=TRUE)
-#meta = read.table("/Users/lleonard/Documents/R/CB_Sequence123/MappingFile123.txt",header=TRUE)
-meta = ("/Users/lleonard/Documents/R/Compiled2019/2019MappingFileFinal.txt")
+#Load into phyloseq for 18S
+meta = ("/FilePath/2019MappingFileFinal.txt")
 meta = import_qiime_sample_data(meta)
 ps_18S <- phyloseq(otu_table(seqtab18, taxa_are_rows=FALSE), 
                    sample_data(meta), 
                    tax_table(tax18))
-
 #read the tree into R and add to the phyloseq object ps.  It's now called ps_t_silva (for phyloseq_tree_silva).**
 tree_Q2 = read.tree("/Users/lleonard/Documents/R/Compiled2019/aligned/18S_uniques_aligned_pfiltered.tre")
 tree_Q2 = root(tree_Q2, 1, resolve.root = T)
 ps_t_18S = merge_phyloseq(ps_18S,tree_Q2) 
 
 unrare_18S = ps_t_18S
-
 #Run, check all numbers are different.
 sample_counts18S = sample_sums(unrare_18S)
-write.csv(sample_counts18S, "sums18.csv")
 ```
 
 ```{r}
 #Load into phyloseq FOR 16S
-#ps <- phyloseq(otu_table(seqtab, taxa_are_rows=FALSE), tax_table(tax))
-#map <-read.csv("file.csv", sep=";", header=TRUE)
-#meta = read.table("/Users/lleonard/Documents/R/CB_Sequence123/MappingFile123.txt",header=TRUE)
-meta = ("/Users/lleonard/Documents/R/Compiled2019/2019MappingFileFinal.txt")
-#meta = ("/Users/lleonard/Documents/R/Compiled2019/2019_Meta_Factors.txt")
+meta = ("/FilePath/2019MappingFileFinal.txt")
 meta = import_qiime_sample_data(meta)
 ps_16S <- phyloseq(otu_table(seqtab, taxa_are_rows=FALSE), 
                    sample_data(meta), 
@@ -209,17 +174,14 @@ tree_Q2 = root(tree_Q2, 1, resolve.root = T)
 ps_t_16S = merge_phyloseq(ps_16S,tree_Q2) 
 
 unrare_16S = ps_t_16S
-
 #Run, check all numbers are different.
 sample_counts16 = sample_sums(unrare_16S)
-write.csv(sample_counts16, "sums16.csv")
 ```
 
 ```{r}
-#Rarefy to 5404. Be sure to make a CSV and sort from smallest to largest, and just see if there is a clear drop where you can cut off
-#Run CB_all tomake sure numbers make sense. 
-
-#Filter out 18S, 16S, Mitochondria and Chloroplasts. Run these sets: CB_18S (hit control, enter) make sure numbers #look right, make sense. 
+#Rarify to 4299. Be sure to make a CSV and sort from smallest to largest, and just see if there is a clear drop where you can cut off
+#Run CB_all to make sure numbers make sense. 
+#Filter out 18S, 16S, Mitochondria and Chloroplasts.
 CB16S = subset_taxa(unrare_16S, (Kingdom != "Eukaryota")&(Class != "Chloroplast")&(Family != "Mitochondria"))
 sums<-sample_sums(CB16S)
 write.csv(sums, "16Ssums.csv")
@@ -232,12 +194,7 @@ write.csv(otu_table(CB16S), "16Sotu.csv")
 ```
 
 ```{r}
-#set.seed(58373)
-#CB18S = rarefy_even_depth(unrare_18S, sample.size = 6440, replace = FALSE, trimOTUs = TRUE)
-#Make sure here all the numbers are the same, right now they will be 5849
-#This was really hard, because some had great depth, but the majority did not, so it's a hard balance. Ended up going to 200 like Kristin suggested.
-#As result, 116 samples wre removed. 1128OTUs were removed. :(
-#sample_sums(CB18S)
+#Rarify to 200. Not ideal, but the best option to have some samples to analyze.
 CB_18S = subset_taxa(unrare_18S, Kingdom == "Eukaryota")
 sums <-sample_sums(CB_18S)
 write.csv(sums, "18Ssums.csv")
@@ -250,7 +207,8 @@ write.csv(otu_table(CB16S), "18Sotu.csv")
 
 ```{r}
 #FILTER OTU TABLES
-#16S, filter by site
+#16S, filter samples for analysis
+#To make comparisons between needle types for each date.
 CB16_Pos=subset_samples(CB_16S, Needle =="Positive")
 CB16_NoPos=subset_samples(CB_16S, (Needle !="Positive")&(Needle != "Blank")&(Needle != "Spruce"))
 CB16_LM = subset_samples(CB_16S, Location == "Lower Montane") 
