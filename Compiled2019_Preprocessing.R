@@ -180,17 +180,14 @@ sample_sums(CB_18S)
 write.csv(otu_table(CB16S), "18Sotu.csv")
 
 #FILTER OTU TABLES
-#16S, filter out positive, negative, and excess samples we do not need
-CB16_Pos=subset_samples(CB_16S, Needle =="Positive")
-CB16_NoPos=subset_samples(CB_16S, (Needle !="Positive")&(Needle != "Blank")&(Needle != "Spruce"))
-CB16Paper2= subset_samples(CB16_NoPos, (Needle !="Red")&(Needle != "2Red")&(Needle != "Shade")&(Horizon !="Bot")&(Elevation !="NO"))
 #Filter samples by site location
 CB16_LM = subset_samples(CB_16S, Location == "Lower Montane")
-CB16_LM_Paper2=subset_samples(CB16_LM, (Needle !="Red")&(Needle !="Green")&(Needle !="Lodge")&(Horizon !="Bot"))
+  CB16_LM_Paper2=subset_samples(CB16_LM, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
 CB16_LS = subset_samples(CB_16S, Location == "Lower Subalpine")
-CB16_LS_Paper2=subset_samples(CB16_LS, (Needle !="Red")&(Needle !="Shade")&(Needle !="Lodge")&(Needle !="Control")&(Horizon !="Bot"))
+  CB16_LS_Paper2=subset_samples(CB16_LS_regular, (Needle !="Red")&(Needle !="Shade")&(Needle !="2Red")&(Horizon !="Bot"))
+  CB16_LS_Paper2_SM=subset_samples(CB16_LS_induced, (Needle !="Red")&(Needle !="Shade")&(Needle !="2Red")&(Horizon !="Bot"))
 CB16_US = subset_samples(CB_16S, Location == "Upper Subalpine")
-CB16_US_Paper2=subset_samples(CB16_US_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Needle !="Lodge")&(Needle !="Control")&(Horizon !="Bot"))
+  CB16_US_Paper2=subset_samples(CB16_US_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
 #_______________Lower_______________#
 #Specifiy sample types for Lower
 CB16LM_Green= subset_samples(CB16_LM, (Needle=="Green")&(Horizon !="Bot"))
@@ -263,17 +260,17 @@ USFour=subset_samples(CB16_US_Paper2, Date=="d_Four")
 USFive=subset_samples(CB16_US_Paper2, Date=="e_Five")
 USSix=subset_samples(CB16_US_Paper2, Date=="f_Six")
 USSeven=subset_samples(CB16_US_Paper2, Date=="g_Seven")
-
+#######################################################################
+  ###Next up: 18S
+#######################################################################
 #18S, filter out positive, negative, and excess samples we do not need
-CB18_NoPos=subset_samples(CB_18S, (Needle !="Positive")&(Needle != "Blank")&(Needle != "Spruce")&(Sample !="LM.G2.2.09.20.2019")&(Sample!="LS.2XR3.SM.06.14.2019"))
 CB18_LM = subset_samples(CB_18S, Location == "Lower Montane") 
 CB18_LS = subset_samples(CB_18S, Location == "Lower Subalpine")
 CB18_US = subset_samples(CB_18S, Location == "Upper Subalpine")
-CB18Paper2= subset_samples(CB18_NoPos, (Needle !="Red")&(Needle != "2Red")&(Needle != "Shade")&(Horizon !="Bot")&(Elevation !="NO"))
 CB18_LS_induced = subset_samples(CB18_LS, Snowmelt == "Induced")
 CB18_LS_regular = subset_samples(CB18_LS, Snowmelt == "Regular")
 #_______________Lower_______________#
-CB18_LM_Paper2=subset_samples(CB18Paper2, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
+CB18_LM_Paper2=subset_samples(CB18_LM, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
 LMOne_18S=subset_samples(CB18_LM_Paper2, Date=="a_One")
 LMTwo_18S=subset_samples(CB18_LM_Paper2, Date=="b_Two")
 LMThree_18S=subset_samples(CB18_LM_Paper2, Date=="c_Three")
@@ -282,7 +279,7 @@ LMFive_18S=subset_samples(CB18_LM_Paper2, Date=="e_Five")
 LMSix_18S=subset_samples(CB18_LM_Paper2, Date=="f_Six")
 LMSeven_18S=subset_samples(CB18_LM_Paper2, Date=="g_Seven")
 #_______________Middle_______________#  
-CB18_LS_Paper2=subset_samples(CB18Paper2, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
+CB18_LS_Paper2=subset_samples(CB18_LS_regular, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
 LSOne_18S=subset_samples(CB18_LS_Paper2, Date=="a_One")
 LSTwo_18S=subset_samples(CB18_LS_Paper2, Date=="b_Two")
 LSThree_18S=subset_samples(CB18_LS_Paper2, Date=="c_Three")
@@ -291,7 +288,7 @@ LSFive_18S=subset_samples(CB18_LS_Paper2, Date=="e_Five")
 LSSix_18S=subset_samples(CB18_LS_Paper2, Date=="f_Six")
 LSSeven_18S=subset_samples(CB18_LS_Paper2, Date=="g_Seven")
 #_______________Upper_______________#  
-CB18_US_Paper2=subset_samples(CB18Paper2, (Needle !="Red")&(Needle !="Shade")&(Needle !="Control")&(Horizon !="Bot"))
+CB18_US_Paper2=subset_samples(CB18_US, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
 USOne_18S=subset_samples(CB18_US_Paper2, Date=="a_One")
 USTwo_18S=subset_samples(CB18_US_Paper2, Date=="b_Two")
 USThree_18S=subset_samples(CB18_US_Paper2, Date=="c_Three")
