@@ -1,0 +1,44 @@
+#2016 FTIR data: Code to baseline correct and plot provided by Zhao Hao. 
+setwd("/FilePath/2016Needles/")  ### set a working directory
+#load the library
+library(hyperSpec)
+#load in assemble.data function for importing csv data into a hyperSpec object.
+source("assemble.data.R")
+dat.pat <- "/Filepath/2016Needles/"   
+# Check the .csv files are correct
+dat.fns <- list.files(dat.pat, "*.csv")   
+# name the samples with unique names, here I use the name of the files.
+dat.sns <- substr(dat.fns, 1, nchar(dat.fns) - 4
+# assemble the csv files to a hyperSpec object.
+df.dat <- assemble.data(paste(dat.pat, dat.fns, sep = ""), data.frame(dat.sns))
+# cut to the low frequency side of spectra. 
+df.cut <- df.dat[,, 700 ~ 1850]
+# baseline correction with a rubberband profile
+df.cor <- df.cut - spc.rubberband(df.cut)
+### normalization if needed
+df.norm <- sweep (df.cor, 1, mean, "/")
+#Plot the spectra:
+Spectra2016=plotspc(df.norm, col = c("darkgreen", "black"), nxticks=20)
+
+#2016 FTIR data: Code to baseline correct and plot provided by Zhao Hao. 
+#set a working directory
+setwd("/FilePath/2019Needles/")  
+#load the library
+library(hyperSpec)
+#load in assemble.data function for importing csv data into a hyperSpec object.
+source("assemble.data.R")
+dat.pat <- "/Filepath/2019Needles/"   
+# Check the .csv files are correct
+dat.fns <- list.files(dat.pat, "*.csv")   
+# name the samples with unique names, here I use the name of the files.
+dat.sns <- substr(dat.fns, 1, nchar(dat.fns) - 4
+# assemble the csv files to a hyperSpec object.
+df.dat <- assemble.data(paste(dat.pat, dat.fns, sep = ""), data.frame(dat.sns))
+# cut to the low frequency side of spectra. 
+df.cut <- df.dat[,, 700 ~ 1850]
+# baseline correction with a rubberband profile
+df.cor <- df.cut - spc.rubberband(df.cut)
+### normalization if needed
+df.norm <- sweep (df.cor, 1, mean, "/")
+#Plot the spectra:
+Spectra2016=plotspc(df.norm, col = c("darkgreen", "black"), nxticks=20)
