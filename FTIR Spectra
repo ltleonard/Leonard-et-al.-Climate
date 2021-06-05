@@ -1,3 +1,6 @@
+#Note, files required are included in the repository as: "2019 FTIR Data" and "2016 FTIR Data". Each file for each sample is within, that you can 
+#set into your working directory. 
+
 #2016 FTIR data: Code to baseline correct and plot provided by Zhao Hao. 
 setwd("/FilePath/2016Needles/")  ### set a working directory
 #load the library
