@@ -10,223 +10,209 @@ des18_LM = subset_samples(des_18S, Location == "Lower Montane")
 des18_LS = subset_samples(des_18S, Location == "Lower Subalpine")
 des18_US = subset_samples(des_18S, Location == "Upper Subalpine")
 
-des18_LS_induced = subset_samples(des18_LS, Snowmelt == "Induced")
-des18_LS_reg = subset_samples(des18_LS, Snowmelt == "Regular")
-
 #16S, filter by site
 des16_LM = subset_samples(unrare_16S, Location == "Lower Montane") 
 des16_LS = subset_samples(unrare_16S, Location == "Lower Subalpine")
 des16_US = subset_samples(unrare_16S, Location == "Upper Subalpine")
 
-#Select samples specific to this study/ paper
-desCB16_LM_nobotordubs = subset_samples(des16_LM , (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="A3.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-desCB16_LSreg_No_2Red = subset_samples(CB16_LS_regular , (Needle != "2Red"))
-desCB16_LSreg_No_2Redorbot = subset_samples(CB16_LSreg_No_2Red , (Horizon != "Bot"))
-desCB16_LS_no2red_bot_dubs=subset_samples(CB16_LSreg_No_2Redorbot, (Sample !="C10.10.14.17")&(Sample !="C4.10.14.17")& (Sample !="E10.10.14.17")&(Sample !="E12.10.14.17")&(Sample !="F4.10.14.17")&(Sample !="F8.10.14.17"))
-desCB16_US_nobotordubs = subset_samples(CB16_US , (Horizon != "Bot"), (Sample!="G7.10.14.17"))
-
-desCB16_LM_Paper2=subset_samples(desCB16_LM_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
-desCB16_LS_Paper2=subset_samples(desCB16_LS_no2red_bot_dubs, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
-desCB16_US_Paper2=subset_samples(desCB16_US_nobotordubs, (Needle !="Red")&(Needle !="Shade")&(Horizon !="Bot"))
-
 ###Looking at Lower Montane 16S, date 3 versus 4 at the Family level
-LS1_cont_red = subset_samples(desCB16_LM_Paper2, (Date != "b_Two")&(Date != "g_Seven")&(Date != "a_One")&(Date != "e_Five")&(Date != "f_Six"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
+LM1_3v4 = subset_samples(des16_LM, (Date != "b_Two")&(Date != "g_Seven")&(Date != "a_One")&(Date != "e_Five")&(Date != "f_Six"))
+LM1_3v4 <- tax_glom(LM1_3v4, taxrank="Family")
+LM1_3v4_Family_rel = transform_sample_counts(LM1_3v4_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(LM1_3v4_Family_rel)
 write.csv(dat, file='des16_LM_3Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(LM1_3v4 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(LM1_3v4_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
-res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
+res = results(dds, cooksCutoff = FALME) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(LM1_3v4_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LM1_3v4_Family)[rownames(sigtab), ], "matrix"))
 write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v4Family.csv")
 dim(sigtab)
 
 ###Looking at Lower Montane 16S, date 3 versus 5 at the Family level
-LS1_cont_red = subset_samples(desCB16_LM_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "f_Six")&(Date != "g_Seven"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
+LM1_3v5 = subset_samples(des16_LM, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "f_Six")&(Date != "g_Seven"))
+LM1_3v5_Family <- tax_glom(LM1_3v5, taxrank="Family")
+LM1_3v5_Family_rel = transform_sample_counts(LM1_3v5_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(LM1_3v5_Family_rel)
 write.csv(dat, file='des16_LM_35Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(LM1_3v5 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(LM1_3v5_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
-res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
+res = results(dds, cooksCutoff = FALME) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(LM1_3v5_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LM1_3v5_Family)[rownames(sigtab), ], "matrix"))
 write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v5Family.csv")
 dim(sigtab)
 
 ###Looking at Lower Montane 16S, date 3 versus 6 at the Family level
-LS1_cont_red = subset_samples(desCB16_LM_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "e_Five")&(Date != "g_Seven"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
+LM1_3v6 = subset_samples(desCB16_LM_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "e_Five")&(Date != "g_Seven"))
+LM1_3v6_Family <- tax_glom(LM1_3v6, taxrank="Family")
+LM1_3v6_Family_rel = transform_sample_counts(LM1_3v6_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(LM1_3v6_Family_rel)
 write.csv(dat, file='des16_LM_36Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(LM1_3v6 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(LM1_3v6_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
-res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
+res = results(dds, cooksCutoff = FALME) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(LM1_3v6_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LM1_3v6_Family)[rownames(sigtab), ], "matrix"))
 write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v6Family.csv")
 dim(sigtab)
 
 ##############################################################################################################
 
 ###Looking at Lower Subalpine 16S, date 3 versus 4 at the Family level
-LS1_cont_red = subset_samples(desCB16_LS_Paper2, (Date != "b_Two")&(Date != "g_Seven")&(Date != "a_One")&(Date != "e_Five")&(Date != "f_Six"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
-write.csv(dat, file='des16_LM_3Family.csv')
+LS1_3v4 = subset_samples(desCB16_LS_Paper2, (Date != "b_Two")&(Date != "g_Seven")&(Date != "a_One")&(Date != "e_Five")&(Date != "f_Six"))
+LS1_3v4_Family <- tax_glom(LS1_3v4, taxrank="Family")
+LS1_3v4_Family_rel = transform_sample_counts(LS1_3v4_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(LS1_3v4_Family_rel)
+write.csv(dat, file='des16_LS_3Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(LS1_3v4 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(LS1_3v4_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
 res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(LS1_3v4_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
-write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v4Family.csv")
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_3v4_Family)[rownames(sigtab), ], "matrix"))
+write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LS_3v4Family.csv")
 dim(sigtab)
 
-###Looking at Lower Montane 16S, date 3 versus 5 at the Family level
-LS1_cont_red = subset_samples(desCB16_LS_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "f_Six")&(Date != "g_Seven"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
-write.csv(dat, file='des16_LM_35Family.csv')
+###Looking at Lower Subalpine 16S, date 3 versus 5 at the Family level
+LS1_3v5 = subset_samples(desCB16_LS_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "f_Six")&(Date != "g_Seven"))
+LS1_3v5_Family <- tax_glom(LS1_3v5, taxrank="Family")
+LS1_3v5_Family_rel = transform_sample_counts(LS1_3v5_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(LS1_3v5_Family_rel)
+write.csv(dat, file='des16_LS_35Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(LS1_3v5 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(LS1_3v5_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
 res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(LS1_3v5_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
-write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v5Family.csv")
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_3v5_Family)[rownames(sigtab), ], "matrix"))
+write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LS_3v5Family.csv")
 dim(sigtab)
 
-###Looking at Lower Montane 16S, date 3 versus 6 at the Family level
-LS1_cont_red = subset_samples(desCB16_LS_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "e_Five")&(Date != "g_Seven"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
-write.csv(dat, file='des16_LM_36Family.csv')
+###Looking at Lower Subalpine 16S, date 3 versus 6 at the Family level
+LS1_3v6 = subset_samples(desCB16_LS_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "e_Five")&(Date != "g_Seven"))
+LS1_3v6_Family <- tax_glom(LS1_3v6, taxrank="Family")
+LS1_3v6_Family_rel = transform_sample_counts(LS1_3v6_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(LS1_3v6_Family_rel)
+write.csv(dat, file='des16_LS_36Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(LS1_3v6 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(LS1_3v6_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
 res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(LS1_3v6_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
-write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v6Family.csv")
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_3v6_Family)[rownames(sigtab), ], "matrix"))
+write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LS_3v6Family.csv")
 dim(sigtab)
 
 ##############################################################################################################
 
 ###Looking at Upper Subalpine 16S, date 3 versus 4 at the Family level
-LS1_cont_red = subset_samples(desCB16_US_Paper2, (Date != "b_Two")&(Date != "g_Seven")&(Date != "a_One")&(Date != "e_Five")&(Date != "f_Six"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
+US1_3v4 = subset_samples(desCB16_US_Paper2, (Date != "b_Two")&(Date != "g_Seven")&(Date != "a_One")&(Date != "e_Five")&(Date != "f_Six"))
+US1_3v4_Family <- tax_glom(US1_3v4, taxrank="Family")
+US1_3v4_Family_rel = transform_sample_counts(US1_3v4_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(US1_3v4_Family_rel)
 write.csv(dat, file='des16_LM_3Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(US1_3v4 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(US1_3v4_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
-res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
+res = results(dds, cooksCutoff = FAUSE) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(US1_3v4_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(US1_3v4_Family)[rownames(sigtab), ], "matrix"))
 write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v4Family.csv")
 dim(sigtab)
 
-###Looking at Lower Montane 16S, date 3 versus 5 at the Family level
-LS1_cont_red = subset_samples(desCB16_US_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "f_Six")&(Date != "g_Seven"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
+###Looking at Upper Subalpine 16S, date 3 versus 5 at the Family level
+US1_3v5 = subset_samples(desCB16_US_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "f_Six")&(Date != "g_Seven"))
+US1_3v5_Family <- tax_glom(US1_3v5, taxrank="Family")
+US1_3v5_Family_rel = transform_sample_counts(US1_3v5_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(US1_3v5_Family_rel)
 write.csv(dat, file='des16_LM_35Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(US1_3v5 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(US1_3v5_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
-res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
+res = results(dds, cooksCutoff = FAUSE) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(US1_3v5_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(US1_3v5_Family)[rownames(sigtab), ], "matrix"))
 write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v5Family.csv")
 dim(sigtab)
 
-###Looking at Lower Montane 16S, date 3 versus 6 at the Family level
-LS1_cont_red = subset_samples(desCB16_US_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "e_Five")&(Date != "g_Seven"))
-LS1_cont_red_Genus <- tax_glom(LS1_cont_red, taxrank="Family")
-LS1_cont_red_Genus_rel = transform_sample_counts(LS1_cont_red_Genus, function(x) 100 * x/sum(x))
-dat <- psmelt(LS1_cont_red_Genus_rel)
+###Looking at Upper Subalpine 16S, date 3 versus 6 at the Family level
+US1_3v6 = subset_samples(desCB16_US_Paper2, (Date != "a_One")&(Date != "b_Two")&(Date != "d_Four")&(Date != "e_Five")&(Date != "g_Seven"))
+US1_3v6_Family <- tax_glom(US1_3v6, taxrank="Family")
+US1_3v6_Family_rel = transform_sample_counts(US1_3v6_Family, function(x) 100 * x/sum(x))
+dat <- psmelt(US1_3v6_Family_rel)
 write.csv(dat, file='des16_LM_36Family.csv')
 #Make DESeqDatasets
-ddsL.otu =phyloseq_to_deseq2(LS1_cont_red , ~Date)
-ddsL.fam =phyloseq_to_deseq2(LS1_cont_red_Genus , ~Date)
+ddsL.otu =phyloseq_to_deseq2(US1_3v6 , ~Date)
+ddsL.fam =phyloseq_to_deseq2(US1_3v6_Family , ~Date)
 dds = DESeq(ddsL.fam, test="Wald", fitType="parametric") #holds normalized counts for each sample
-res = results(dds, cooksCutoff = FALSE) # holds log2fold change and base means
+res = results(dds, cooksCutoff = FAUSE) # holds log2fold change and base means
 ddsm = assay(dds) #convert ddsL.pt into a datatable
 ddsdt = as.data.frame(ddsm)
-restab = cbind(as(res, "data.frame"), as(tax_table(LS1_cont_red_Genus )[rownames(res), ], "matrix"))
+restab = cbind(as(res, "data.frame"), as(tax_table(US1_3v6_Family )[rownames(res), ], "matrix"))
 restabCounts = cbind(as(restab, "data.frame"), as(ddsdt [rownames(restab),],"data.frame"))
 #write out deseq2 results to csv file (P value <0.05)
 alpha = 0.05
 sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(LS1_cont_red_Genus)[rownames(sigtab), ], "matrix"))
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(US1_3v6_Family)[rownames(sigtab), ], "matrix"))
 write.csv(sigtab, file = "/Users/lleonard/Documents/R/Compiled2019/Deseq/LM_3v6Family.csv")
 dim(sigtab)
