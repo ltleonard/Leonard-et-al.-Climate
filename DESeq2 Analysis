@@ -15,6 +15,9 @@ des16_LM = subset_samples(unrare_16S, Location == "Lower Montane")
 des16_LS = subset_samples(unrare_16S, Location == "Lower Subalpine")
 des16_US = subset_samples(unrare_16S, Location == "Upper Subalpine")
 
+#Note, for simplicity, I renamed the dates in order of sampling, so "One", "Two", "Three", so on.... The dates are as follows:
+#"Three"=May 2018, "Four="Jul 2018", "Five"=Oct 2018, "Six"=May 2019, Jun 2019, or Jul 2019 depending on the location.
+
 ###Looking at Lower Montane 16S, date 3 versus 4 at the Family level
 LM1_3v4 = subset_samples(des16_LM, (Date != "b_Two")&(Date != "g_Seven")&(Date != "a_One")&(Date != "e_Five")&(Date != "f_Six"))
 LM1_3v4 <- tax_glom(LM1_3v4, taxrank="Family")
